@@ -76,8 +76,6 @@ Vehicle::~Vehicle()
 
 void Vehicle::Install()
 {
-    _me->UpdateDisplayPower();
-
     _status = STATUS_INSTALLED;
     if (GetBase()->GetTypeId() == TYPEID_UNIT)
         sScriptMgr->OnInstall(this);
@@ -593,6 +591,15 @@ bool Vehicle::IsVehicleInUse() const
 {
     for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
         if (!itr->second.IsEmpty())
+            return true;
+
+    return false;
+}
+
+bool Vehicle::IsControllableVehicle() const
+{
+    for (SeatMap::const_iterator itr = Seats.begin(); itr != Seats.end(); ++itr)
+        if (itr->second.SeatInfo->HasFlag(VEHICLE_SEAT_FLAG_CAN_CONTROL))
             return true;
 
     return false;
