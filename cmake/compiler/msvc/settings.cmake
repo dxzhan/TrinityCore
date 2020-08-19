@@ -70,7 +70,7 @@ endif()
 # multithreaded compiling on VS
 target_compile_options(trinity-compile-option-interface
   INTERFACE
-    /MP)
+    /MP4)
 
 if((PLATFORM EQUAL 64) OR (NOT CMAKE_CXX_COMPILER_VERSION VERSION_LESS 19.0.23026.0) OR BUILD_SHARED_LIBS)
   # Enable extended object support
