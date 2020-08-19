@@ -9,16 +9,11 @@ if(WITH_WARNINGS)
       -W
       -Wall
       -Wextra
+      -Wimplicit-fallthrough
       -Winit-self
       -Wfatal-errors
       -Wno-mismatched-tags
       -Woverloaded-virtual)
- 
-  if(CMAKE_CXX_COMPILER_VERSION VERSION_GREATER_EQUAL 10)
-    target_compile_options(trinity-warning-interface
-      INTERFACE
-        -Wno-deprecated-copy) # warning in g3d
-  endif()
 
   message(STATUS "Clang: All warnings enabled")
 endif()
@@ -57,7 +52,7 @@ target_compile_options(trinity-compile-option-interface
     -Wno-narrowing
     -Wno-deprecated-register)
 
-if (BUILD_SHARED_LIBS)
+if(BUILD_SHARED_LIBS)
   # -fPIC is needed to allow static linking in shared libs.
   # -fvisibility=hidden sets the default visibility to hidden to prevent exporting of all symbols.
   target_compile_options(trinity-compile-option-interface
