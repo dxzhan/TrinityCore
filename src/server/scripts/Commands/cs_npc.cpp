@@ -836,7 +836,7 @@ public:
             return false;
         }
 
-        if (!sCreatureDisplayInfoStore.LookupEntry(displayId))
+        if (sCreatureDisplayInfoStore.LookupEntry(displayId) == nullptr)
         {
             handler->PSendSysMessage(LANG_COMMAND_INVALID_PARAM, args);
             handler->SetSentErrorMessage(true);
