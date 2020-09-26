@@ -159,7 +159,7 @@ bool ChatHandler::_ParseCommands(std::string_view text)
         return true;
 
 #ifdef ELUNA
-    if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text))
+    if (!sEluna->OnCommand(GetSession() ? GetSession()->GetPlayer() : NULL, text.data()))
         return true;
 #endif
 

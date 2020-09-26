@@ -43,6 +43,7 @@ EndScriptData */
 #include "Transport.h"
 #include "World.h"
 #include "WorldSession.h"
+#include "DBCStructure.h"
 
 using namespace Trinity::ChatCommands;
 
@@ -655,7 +656,7 @@ public:
             return false;
         }
 
-        if (sCreatureDisplayInfoStore.LookupEntry(displayId) == nullptr)
+        if (sCreatureDisplayInfoStoreRaw.LookupEntry(displayId) == nullptr)
         {
             handler->PSendSysMessage(LANG_COMMAND_INVALID_PARAM, Trinity::ToString(displayId).c_str());
             handler->SetSentErrorMessage(true);

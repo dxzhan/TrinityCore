@@ -8943,8 +8943,8 @@ void ObjectMgr::LoadCreatureOutfits()
         co->gender       = fields[i++].GetUInt8();
         switch (co->gender)
         {
-        case GENDER_FEMALE: co->displayId = rEntry->model_f; break;
-        case GENDER_MALE:   co->displayId = rEntry->model_m; break;
+        case GENDER_FEMALE: co->displayId = rEntry->FemaleDisplayID; break;
+        case GENDER_MALE:   co->displayId = rEntry->MaleDisplayID; break;
         default:
             TC_LOG_ERROR("server.loading", ">> Outfit entry %u in `creature_template_outfits` has invalid gender %u", entry, uint32(co->gender));
             continue;
@@ -8965,7 +8965,7 @@ void ObjectMgr::LoadCreatureOutfits()
                 if (ItemTemplate const* proto = sObjectMgr->GetItemTemplate(item_entry))
                     co->outfitdisplays[slot] = proto->DisplayInfoID;
                 else if (auto * dbcentry = sItemStore.LookupEntry(item_entry))
-                    co->outfitdisplays[slot] = dbcentry->DisplayId;
+                    co->outfitdisplays[slot] = dbcentry->DisplayInfoID;
                 else
                 {
                     TC_LOG_ERROR("server.loading", ">> Outfit entry %u in `creature_template_outfits` has invalid item entry: %u. Ignoring.", entry, item_entry);

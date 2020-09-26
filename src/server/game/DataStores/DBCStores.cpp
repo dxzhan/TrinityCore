@@ -118,7 +118,7 @@ DBCStorage <HolidaysEntry>                sHolidaysStore(Holidaysfmt);
 DBCStorage <ItemEntry>                    sItemStore(Itemfmt);
 DBCStorage <ItemBagFamilyEntry>           sItemBagFamilyStore(ItemBagFamilyfmt);
 //DBCStorage <ItemCondExtCostsEntry> sItemCondExtCostsStore(ItemCondExtCostsEntryfmt);
-//DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt); -- not used currently
+//DBCStorage <ItemDisplayInfoEntry> sItemDisplayInfoStore(ItemDisplayTemplateEntryfmt);
 DBCStorage <ItemExtendedCostEntry> sItemExtendedCostStore(ItemExtendedCostEntryfmt);
 DBCStorage <ItemLimitCategoryEntry> sItemLimitCategoryStore(ItemLimitCategoryEntryfmt);
 DBCStorage <ItemRandomPropertiesEntry> sItemRandomPropertiesStore(ItemRandomPropertiesfmt);
@@ -305,7 +305,7 @@ void LoadDBCStores(const std::string& dataPath)
     LOAD_DBC(sChrRacesStore,                      "ChrRaces.dbc");
     LOAD_DBC(sCinematicCameraStore,               "CinematicCamera.dbc");
     LOAD_DBC(sCinematicSequencesStore,            "CinematicSequences.dbc");
-    LOAD_DBC(sCreatureDisplayInfoStoreRaw,        "CreatureDisplayInfo.dbc");
+    //LOAD_DBC(sCreatureDisplayInfoStore,           "CreatureDisplayInfo.dbc");
     LOAD_DBC(sCreatureDisplayInfoExtraStore,      "CreatureDisplayInfoExtra.dbc");
     LOAD_DBC(sCreatureFamilyStore,                "CreatureFamily.dbc");
     LOAD_DBC(sCreatureModelDataStore,             "CreatureModelData.dbc");

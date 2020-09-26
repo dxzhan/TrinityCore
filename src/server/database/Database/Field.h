@@ -117,6 +117,11 @@ class TC_DATABASE_API Field
         }
 
 
+        DatabaseFieldTypes GetType() const
+        {
+            return meta->Type;
+        }
+
         bool IsNull() const
         {
             return data.value == nullptr;

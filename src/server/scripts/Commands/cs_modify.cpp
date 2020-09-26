@@ -25,6 +25,7 @@ EndScriptData */
 #include "ScriptMgr.h"
 #include "Chat.h"
 #include "DBCStores.h"
+#include "DBCStructure.h"
 #include "Log.h"
 #include "ObjectMgr.h"
 #include "Opcodes.h"
@@ -513,7 +514,7 @@ public:
             return false;
 
         uint32 mount = atoul(mount_cstr);
-        if (sCreatureDisplayInfoStore.LookupEntry(mount) == nullptr)
+        if (sCreatureDisplayInfoStoreRaw.LookupEntry(mount) == nullptr)
         {
             handler->SendSysMessage(LANG_NO_MOUNT);
             handler->SetSentErrorMessage(true);

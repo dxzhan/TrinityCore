@@ -80,8 +80,9 @@ namespace Trinity::Impl::Readline
 void utf8print(void* /*arg*/, std::string_view str)
 {
 #if TRINITY_PLATFORM == TRINITY_PLATFORM_WINDOWS
-    std::wstring wbuf;
-    if (!Utf8toWStr(str, wbuf))
+    wchar_t wtemp_buf[6000];
+    size_t wtemp_len = 6000 - 1;
+    if (!Utf8toWStr(str, wtemp_buf, wtemp_len))
         return;
 
     char temp_buf[6000];
