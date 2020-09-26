@@ -1501,7 +1501,7 @@ void GameObject::Use(Unit* user)
         if (sEluna->OnGossipHello(playerUser, this))
             return;
 #endif
-        if (AI()->GossipHello(playerUser))
+        if (AI()->OnGossipHello(playerUser))
             return;
     }
 

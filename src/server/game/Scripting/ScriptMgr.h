@@ -20,6 +20,8 @@
 
 #include "Common.h"
 #include "ObjectGuid.h"
+#include "Tuples.h"
+#include "Types.h"
 #include <vector>
 
 class AccountMgr;
@@ -30,7 +32,6 @@ class Battlefield;
 class Battleground;
 class BattlegroundMap;
 class Channel;
-class ChatCommand;
 class Creature;
 class CreatureAI;
 class DynamicObject;
@@ -71,6 +72,8 @@ struct CreatureData;
 struct ItemTemplate;
 struct MapEntry;
 struct Position;
+
+namespace Trinity::ChatCommands { struct ChatCommandBuilder; }
 
 enum BattlegroundTypeId : uint32;
 enum ContentLevels : uint8;
@@ -466,7 +469,8 @@ class TC_GAME_API OnlyOnceAreaTriggerScript : public AreaTriggerScript
         bool OnTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) final override;
 
     protected:
-        virtual bool _OnTrigger(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) = 0;
+        // returns true if the trigger was successfully handled, false if we should try again next time
+        virtual bool TryHandleOnce(Player* /*player*/, AreaTriggerEntry const* /*trigger*/) = 0;
         void ResetAreaTriggerDone(InstanceScript* /*instance*/, uint32 /*triggerId*/);
         void ResetAreaTriggerDone(Player const* /*player*/, AreaTriggerEntry const* /*trigger*/);
 };
@@ -515,7 +519,7 @@ class TC_GAME_API CommandScript : public ScriptObject
     public:
 
         // Should return a pointer to a valid command table (ChatCommand array) to be used by ChatHandler.
-        virtual std::vector<ChatCommand> GetCommands() const = 0;
+        virtual std::vector<Trinity::ChatCommands::ChatCommandBuilder> GetCommands() const = 0;
 };
 
 class TC_GAME_API WeatherScript : public ScriptObject, public UpdatableScript<Weather>
@@ -979,7 +983,7 @@ class TC_GAME_API ScriptMgr
 
     public: /* CommandScript */
 
-        std::vector<ChatCommand> GetChatCommands();
+        std::vector<Trinity::ChatCommands::ChatCommandBuilder> GetChatCommands();
 
     public: /* WeatherScript */
 
@@ -1109,33 +1113,49 @@ class TC_GAME_API ScriptMgr
         std::string _currentContext;
 };
 
-template <class S>
-class GenericSpellScriptLoader : public SpellScriptLoader
+namespace Trinity::SpellScripts
 {
-    public:
-        GenericSpellScriptLoader(char const* name) : SpellScriptLoader(name) { }
-        SpellScript* GetSpellScript() const override { return new S(); }
-};
-#define RegisterSpellScript(spell_script) new GenericSpellScriptLoader<spell_script>(#spell_script)
+    template<typename T>
+    using is_SpellScript = std::is_base_of<SpellScript, T>;
 
-template <class A>
-class GenericAuraScriptLoader : public SpellScriptLoader
-{
-    public:
-        GenericAuraScriptLoader(char const* name) : SpellScriptLoader(name) { }
-        AuraScript* GetAuraScript() const override { return new A(); }
-};
-#define RegisterAuraScript(aura_script) new GenericAuraScriptLoader<aura_script>(#aura_script)
+    template<typename T>
+    using is_AuraScript = std::is_base_of<AuraScript, T>;
+}
 
-template <class S, class A>
+template <typename... Ts>
 class GenericSpellAndAuraScriptLoader : public SpellScriptLoader
 {
-    public:
-        GenericSpellAndAuraScriptLoader(char const* name) : SpellScriptLoader(name) { }
-        SpellScript* GetSpellScript() const override { return new S(); }
-        AuraScript* GetAuraScript() const override { return new A(); }
+    using SpellScriptType = typename Trinity::find_type_if_t<Trinity::SpellScripts::is_SpellScript, Ts...>;
+    using AuraScriptType = typename Trinity::find_type_if_t<Trinity::SpellScripts::is_AuraScript, Ts...>;
+    using ArgsType = typename Trinity::find_type_if_t<Trinity::is_tuple, Ts...>;
+
+public:
+    GenericSpellAndAuraScriptLoader(char const* name, ArgsType&& args) : SpellScriptLoader(name), _args(std::move(args)) { }
+
+private:
+    SpellScript* GetSpellScript() const override
+    {
+        if constexpr (!std::is_same_v<SpellScriptType, Trinity::find_type_end>)
+            return Trinity::new_from_tuple<SpellScriptType>(_args);
+        else
+            return nullptr;
+    }
+
+    AuraScript* GetAuraScript() const override
+    {
+        if constexpr (!std::is_same_v<AuraScriptType, Trinity::find_type_end>)
+            return Trinity::new_from_tuple<AuraScriptType>(_args);
+        else
+            return nullptr;
+    }
+
+    ArgsType _args;
 };
-#define RegisterSpellAndAuraScriptPair(spell_script, aura_script) new GenericSpellAndAuraScriptLoader<spell_script, aura_script>(#spell_script)
+
+#define RegisterSpellScriptWithArgs(spell_script, script_name, ...) new GenericSpellAndAuraScriptLoader<spell_script, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellScript(spell_script) RegisterSpellScriptWithArgs(spell_script, #spell_script)
+#define RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, script_name, ...) new GenericSpellAndAuraScriptLoader<script_1, script_2, decltype(std::make_tuple(__VA_ARGS__))>(script_name, std::make_tuple(__VA_ARGS__))
+#define RegisterSpellAndAuraScriptPair(script_1, script_2) RegisterSpellAndAuraScriptPairWithArgs(script_1, script_2, #script_1)
 
 template <class AI>
 class GenericCreatureScript : public CreatureScript

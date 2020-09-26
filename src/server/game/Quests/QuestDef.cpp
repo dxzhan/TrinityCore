@@ -235,9 +235,9 @@ uint32 Quest::GetXPReward(Player const* player) const
     return true;
 }
 
-void Quest::BuildQuestRewards(WorldPackets::Quest::QuestRewards& rewards, Player* player) const
+void Quest::BuildQuestRewards(WorldPackets::Quest::QuestRewards& rewards, Player* player, bool sendHiddenRewards) const
 {
-    if (!HasFlag(QUEST_FLAGS_HIDDEN_REWARDS))
+    if (!HasFlag(QUEST_FLAGS_HIDDEN_REWARDS) || sendHiddenRewards)
     {
         for (uint32 i = 0; i < QUEST_REWARD_CHOICES_COUNT; ++i)
         {
@@ -260,7 +260,7 @@ void Quest::BuildQuestRewards(WorldPackets::Quest::QuestRewards& rewards, Player
             if (ItemTemplate const* itemTemplate = sObjectMgr->GetItemTemplate(RewardItemId[i]))
                 displayID = itemTemplate->DisplayInfoID;
 
-            rewards.UnfilteredChoiceItems.emplace_back(RewardItemId[i], RewardItemIdCount[i], displayID);
+            rewards.RewardItems.emplace_back(RewardItemId[i], RewardItemIdCount[i], displayID);
         }
 
         rewards.RewardMoney = GetRewOrReqMoney(player);
@@ -463,9 +463,6 @@ WorldPacket Quest::BuildQueryData(LocaleConstant loc) const
     response.Info.POIx = GetPOIx();
     response.Info.POIy = GetPOIy();
     response.Info.POIPriority = GetPointOpt();
-
-    if (sWorld->getBoolConfig(CONFIG_UI_QUESTLEVELS_IN_DIALOGS))
-        Quest::AddQuestLevelToTitle(locQuestTitle, GetQuestLevel());
 
     response.Info.Title = locQuestTitle;
     response.Info.Objectives = locQuestObjectives;
