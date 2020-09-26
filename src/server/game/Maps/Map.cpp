@@ -4006,8 +4006,10 @@ void InstanceMap::CreateInstanceData(bool load)
 
     // use mangos behavior if we are dealing with Eluna AI
     // initialize should then be called only if load is false
+#ifndef TRINITY
     if (!isElunaAI || !load)
         i_data->Initialize();
+#endif
 
     if (load)
     {

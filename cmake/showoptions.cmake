@@ -33,7 +33,7 @@ else()
   message("* Build with scripts     : No")
 endif()
 
-if( ELUNA )
+if(ELUNA)
   message("* Build Eluna LuaEngine  : Yes (default)")
   add_definitions(-DELUNA)
   add_definitions(-DTRINITY)

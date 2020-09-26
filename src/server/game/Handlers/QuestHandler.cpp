@@ -105,10 +105,12 @@ void WorldSession::HandleQuestgiverHelloOpcode(WorldPacket& recvData)
     creature->SetHomePosition(creature->GetPosition());
 
     _player->PlayerTalkClass->ClearMenus();
+
 #ifdef ELUNA
     if (sEluna->OnGossipHello(_player, creature))
         return;
 #endif
+
     if (creature->AI()->OnGossipHello(_player))
         return;
 
